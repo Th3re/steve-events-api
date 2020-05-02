@@ -23,7 +23,7 @@ definitions:
         description: Google user's unique identifier
         example: "108032329945935107776"
       events:
-        type: object
+        type: array
         description: User's events
   StoreEventsResponse:
     description: Store users events response
@@ -64,7 +64,7 @@ definitions:
         description: Server response
         example: "Events retrieved"
       events:
-        type: object
+        type: array
   ProposeDateRequest:
     type: object
     required:
