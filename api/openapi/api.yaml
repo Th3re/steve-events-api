@@ -63,6 +63,8 @@ definitions:
         type: string
         description: Server response
         example: "Events retrieved"
+      events:
+        type: object
   ProposeDateRequest:
     type: object
     required:
@@ -168,8 +170,9 @@ paths:
           schema:
             type: object
             $ref: '#/definitions/StoreEventsResponse'
-  /{userId}:
+  /events/{userId}:
     post:
+      operationId: api.api.events.post
       summary: Get events by query
       parameters:
         - name: userId
