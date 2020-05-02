@@ -1,0 +1,236 @@
+---
+swagger: "2.0"
+
+info:
+  title: "{{title}}"
+  version: "1.0"
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+definitions:
+  StoreEventsRequest:
+    description: Store users events request
+    type: object
+    required:
+      - userId
+      - events
+    properties:
+      userId:
+        type: string
+        description: Google user's unique identifier
+        example: "108032329945935107776"
+      events:
+        type: object
+        description: User's events
+  StoreEventsResponse:
+    description: Store users events response
+    type: object
+    properties:
+      code:
+        type: string
+        description: Server status code
+        example: "OK"
+      message:
+        type: string
+        description: Server response
+        example: "Events stored"
+      userId:
+        type: string
+        description: Google user's unique identifier
+        example: "108032329945935107776"
+  GetEventsRequest:
+    type: object
+    properties:
+      startTime:
+        type: string
+        format: date-time
+        example: "2020-02-12T15:00:00Z"
+      endTime:
+        type: string
+        format: date-time
+        example: "2020-02-20T15:00:00Z"
+  GetEventsResponse:
+    type: object
+    properties:
+      code:
+        type: string
+        description: Server status code
+        example: "OK"
+      message:
+        type: string
+        description: Server response
+        example: "Events retrieved"
+  ProposeDateRequest:
+    type: object
+    required:
+      - participants
+    properties:
+      participants:
+        type: array
+        description: Participants list
+        example: ["userA", "userB", "userC"]
+  ProposeDateResponse:
+    type: object
+    properties:
+      code:
+        type: string
+        description: Server status code
+        example: "OK"
+      message:
+        type: string
+        description: Server response
+        example: "Events stored"
+      dates:
+        type: array
+        example: ["2021-02-21T20:00:00Z", "2022-03-22T22:00:00Z"]
+  ProposeMeetingPointRequest:
+    type: object
+    required:
+      - participants
+      - datetime
+    properties:
+      participants:
+        type: array
+        description: Participants list
+        example: ["userA", "userB", "userC"]
+      datetime:
+        type: string
+        format: date-time
+        example: "2020-02-20T20:00:00Z"
+  ProposeMeetingPointResponse:
+    type: object
+    properties:
+      code:
+        type: string
+        description: Server status code
+        example: "OK"
+      message:
+        type: string
+        description: Server response
+        example: "Meeting points obtained"
+      meetingPoints:
+        type: array
+        example: ["Łojasiewicza 11, Kraków", "Rynek Główny 1, Kraków"]
+  CreateMeetingRequest:
+    type: object
+    required:
+      - participants
+      - datetime
+      - host
+      - meetingPoint
+    properties:
+      participants:
+        type: array
+        description: Participants list
+        example: ["userA", "userB", "userC"]
+      datetime:
+        type: string
+        format: date-time
+        example: "2020-02-20T20:00:00Z"
+      host:
+        type: string
+        description: User that will be hosting an event
+        example: "userA"
+      meetingPoint:
+        type: string
+        description: Meeting point address
+        example: "Times Square"
+  CreateMeetingResponse:
+    type: object
+    properties:
+      code:
+        type: string
+        description: Server status code
+        example: "OK"
+      message:
+        type: string
+        description: Server response
+        example: "Meeting created"
+      meeting:
+        type: object
+
+paths:
+  /store:
+    post:
+      summary: Store user's calendar events
+      description: Store user's calendar events
+      parameters:
+        - name: store_events_request
+          in: body
+          schema:
+            $ref: '#/definitions/StoreEventsRequest'
+      responses:
+        200:
+          description: Events stored
+          schema:
+            type: object
+            $ref: '#/definitions/StoreEventsResponse'
+  /{userId}:
+    post:
+      summary: Get events by query
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+          description: Google user id
+        - name: get_events_request
+          in: body
+          schema:
+            $ref: '#/definitions/GetEventsRequest'
+      responses:
+        200:
+          description: User's events
+          schema:
+            type: object
+            $ref: '#/definitions/GetEventsResponse'
+  /meeting/date:
+    post:
+      operationId: api.api.meeting.date.post
+      summary: Propose date time for users
+      parameters:
+        - name: propose_date_request
+          in: body
+          schema:
+            $ref: '#/definitions/ProposeDateRequest'
+      responses:
+        200:
+          description: Proposed date
+          schema:
+            type: object
+            $ref: '#/definitions/ProposeDateResponse'
+  /meeting/point:
+    post:
+      operationId: api.api.meeting.point.post
+      summary: Propose meeting point for shared event
+      parameters:
+        - name: propose_meeting_point_request
+          in: body
+          schema:
+            $ref: '#/definitions/ProposeMeetingPointRequest'
+      responses:
+        200:
+          description: Proposed meeting point
+          schema:
+            type: object
+            $ref: '#/definitions/ProposeMeetingPointResponse'
+  /meeting/create:
+    post:
+      operationId: api.api.meeting.create.post
+      summary: Create meeting
+      description: Create shared event
+      parameters:
+        - name: create_meeting_request
+          in: body
+          schema:
+            $ref: '#/definitions/CreateMeetingRequest'
+      responses:
+        200:
+          description: Create shared event
+          schema:
+            type: object
+            $ref: '#/definitions/CreateMeetingResponse'
+

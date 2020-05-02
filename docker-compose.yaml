@@ -1,0 +1,13 @@
+---
+version: '3'
+services:
+  steve-events-api:
+    image: steve-events-api:latest
+    container_name: steve-events-api
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    environment:
+      SERVER_PORT: "8088"
+    ports:
+      - 8088:8088
