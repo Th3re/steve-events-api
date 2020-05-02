@@ -16,3 +16,11 @@ services:
       MONGO_COLLECTION: events
     ports:
       - 8088:8088
+  mongo:
+    image: mongo:4.2.3
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "root"
+      MONGO_INITDB_ROOT_PASSWORD: "root"
+    ports:
+      - 27017:27017
