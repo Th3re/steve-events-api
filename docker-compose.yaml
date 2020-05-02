@@ -9,5 +9,10 @@ services:
       dockerfile: ./Dockerfile
     environment:
       SERVER_PORT: "8088"
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_USER: root
+      MONGO_PASSWORD: root
+      MONGO_DATABASE: calendar
+      MONGO_COLLECTION: events
     ports:
       - 8088:8088

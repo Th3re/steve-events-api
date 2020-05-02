@@ -2,6 +2,7 @@ import logging
 
 from api.libs.environment.environmentreader import EnvironmentReader
 from api.libs.representation.pretty import PrettyPrint
+from api.libs.db.mongo import Mongo
 
 LOG = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ class Server(EnvironmentReader):
 class Environment(PrettyPrint):
     def __init__(self):
         self.server = Server()
+        self.mongo = Mongo()
 
     @staticmethod
     def read():

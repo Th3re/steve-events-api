@@ -1,5 +1,6 @@
 import connexion
 import logging
+import pymongo
 from swagger_ui_bundle import swagger_ui_3_path
 
 from api.environment import Environment
@@ -7,6 +8,8 @@ from api.environment import Environment
 
 logging.basicConfig(level=logging.DEBUG)
 env = Environment.read()
+
+mongo_client = pymongo.MongoClient(env.mongo.uri, username=env.mongo.user, password=env.mongo.password)
 
 
 def main():
