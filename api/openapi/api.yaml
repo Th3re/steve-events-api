@@ -68,8 +68,13 @@ definitions:
   ProposeDateRequest:
     type: object
     required:
+      - date
       - participants
     properties:
+      date:
+        type: string
+        format: date
+        description: Intial meeting date
       participants:
         type: array
         description: Participants list
