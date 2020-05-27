@@ -137,7 +137,7 @@ definitions:
       participants:
         type: array
         description: Participants list
-        example: ["userA", "userB", "userC"]
+        example: ["userA@email.com", "userB@example.com", "userC@gmail.com"]
       start:
         type: string
         format: date-time
