@@ -32,3 +32,4 @@ class GoogleScheduler(Scheduler):
         params = dict(alt='json')
         response = self.client.post('/calendar/v3/calendars/primary/events', token, params, body)
         LOG.info(f'Meeting creation response: {response}')
+        return response

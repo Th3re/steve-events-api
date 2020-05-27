@@ -22,9 +22,9 @@ def post(create_meeting_request):
     LOG.info(create_meeting_request)
     token = token_service.fetch(create_meeting_request.host)
     meeting = create_meeting(create_meeting_request)
-    meeting_scheduler.schedule(token, meeting)
+    response = meeting_scheduler.schedule(token, meeting)
     return {
          "code": APICode.OK,
          "message": "Meeting created",
-         "meeting": {}
+         "meeting": {"response": response}
     }, HTTPStatus.OK
