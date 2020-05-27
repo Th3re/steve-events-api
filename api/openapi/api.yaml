@@ -125,18 +125,27 @@ definitions:
     type: object
     required:
       - participants
-      - datetime
+      - start
+      - end
+      - summary
       - host
       - meetingPoint
     properties:
+      summary:
+        type: string
+        example: "Coffee meeting"
       participants:
         type: array
         description: Participants list
         example: ["userA", "userB", "userC"]
-      datetime:
+      start:
         type: string
         format: date-time
         example: "2020-02-20T20:00:00Z"
+      end:
+        type: string
+        format: date-time
+        example: "2020-02-20T21:00:00Z"
       host:
         type: string
         description: User that will be hosting an event
