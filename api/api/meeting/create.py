@@ -10,19 +10,19 @@ LOG = logging.getLogger(__name__)
 
 def create_meeting(request):
     return Meeting(
-        summary=request.summary,
-        start=request.start,
-        end=request.end,
-        location=request.location,
-        participants=request.participants,
+        summary=request.get('summary'),
+        start=request.get('start'),
+        end=request.get('end'),
+        location=request.get('location'),
+        participants=request.get('participants'),
     )
 
 
 def post(create_meeting_request):
     LOG.info(create_meeting_request)
-    token = token_service.fetch(create_meeting_request.host)
+    token = token_service.fetch(create_meeting_request.get('host'))
     meeting = create_meeting(create_meeting_request)
-    response = meeting_scheduler.schedule(token, meeting)
+    response = meeting_scheduler.schedule(token.value, meeting)
     return {
          "code": APICode.OK,
          "message": "Meeting created",

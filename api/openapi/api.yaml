@@ -141,11 +141,11 @@ definitions:
       start:
         type: string
         format: date-time
-        example: "2020-02-20T20:00:00Z"
+        example: "2020-02-20T20:00:00"
       end:
         type: string
         format: date-time
-        example: "2020-02-20T21:00:00Z"
+        example: "2020-02-20T21:00:00"
       host:
         type: string
         description: User that will be hosting an event

@@ -13,16 +13,17 @@ class GoogleScheduler(Scheduler):
 
     @staticmethod
     def _prepare_payload(meeting: Meeting):
+        time_zone = "Europe/Warsaw"
         return {
             "summary": meeting.summary,
             "location": meeting.location,
             "start": {
                 "dateTime": meeting.start,
-                "timeZone": "Poland/Warsaw",
+                "timeZone": time_zone,
             },
             "end": {
                 "dateTime": meeting.end,
-                "timeZone": "Poland/Warsaw",
+                "timeZone": time_zone,
             },
             "attendees": [dict(email=participant) for participant in meeting.participants]
         }
