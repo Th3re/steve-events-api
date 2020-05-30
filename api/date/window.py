@@ -60,7 +60,16 @@ class Window(PrettyPrint):
             start=datetime.fromtimestamp(min(self.start.timestamp(), window.start.timestamp()), tz=self.start.tzinfo),
             end=datetime.fromtimestamp(max(self.end.timestamp(), window.end.timestamp()), tz=self.end.tzinfo)
         )]
-    
+
+    def split_more_xd(self, windows):
+        splitted = []
+        current_window = self
+        for window in windows:
+            result = current_window.split(window)
+            splitted.append(result[0])
+            current_window = result[-1]
+        return splitted
+
     @staticmethod
     def merged(windows):
         sorted_windows = sorted(windows, key=lambda x: x.start.timestamp())
@@ -274,10 +283,10 @@ test_cases = [
     },
 ]
 
-for tc in test_cases:
-    w1 = tc['w1']
-    expect = tc['expect']
-    result = Window.merged(w1)
-    print(f'result: {result}')
-    print(f'expect: {expect}')
-    assert expect == result
+# for tc in test_cases:
+#     w1 = tc['w1']
+#     expect = tc['expect']
+#     result = Window.merged(w1)
+#     print(f'result: {result}')
+#     print(f'expect: {expect}')
+#     assert expect == result
