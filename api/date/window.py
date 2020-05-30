@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from typing import List
-
 from api.libs.date.formatter import DatetimeFormatter, DATETIME_FORMAT
 from api.libs.representation.pretty import PrettyPrint
 
@@ -30,8 +28,8 @@ class Window(PrettyPrint):
         intersection = self.intersect(window)
         if not intersection:
             return [self]
-        w1 = Window(window.start, intersection.start)
-        w2 = Window(intersection.end, window.end)
+        w1 = Window(self.start, intersection.start)
+        w2 = Window(intersection.end, self.end)
         result = []
         if not w1.empty():
             result.append(w1)
@@ -45,8 +43,8 @@ class Window(PrettyPrint):
         if intersection_start >= intersection_end:
             return None
         return Window(
-            start=datetime.fromtimestamp(intersection_start),
-            end=datetime.fromtimestamp(intersection_end)
+            start=datetime.fromtimestamp(intersection_start, tz=self.start.tzinfo),
+            end=datetime.fromtimestamp(intersection_end, tz=self.start.tzinfo)
         )
 
     def __eq__(self, other):
@@ -114,26 +112,39 @@ split_test_cases = [
             Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T23:59:59Z")),
         ]
     },
-    # {
-    #     'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-    #     'w2': Window(start=date("2020-06-06T19:30:00Z"), end=date("2020-06-06T20:45:00Z")),
-    #     'expect': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T20:45:00Z"))
-    # },
-    # {
-    #     'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-    #     'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:45:00Z")),
-    #     'expect': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:00:00Z"))
-    # },
-    # {
-    #     'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-    #     'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:45:00Z")),
-    #     'expect': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:00:00Z"))
-    # },
-    # {
-    #     'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-    #     'w2': Window(start=date("2020-06-06T18:30:00Z"), end=date("2020-06-06T19:45:00Z")),
-    #     'expect': None
-    # },
+    {
+        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
+        'w2': Window(start=date("2020-06-06T19:30:00Z"), end=date("2020-06-06T20:45:00Z")),
+        'expect': [
+            Window(start=date("2020-06-06T20:45:00Z"), end=date("2020-06-06T22:00:00Z"))
+        ]
+    },
+    {
+        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
+        'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:45:00Z")),
+        'expect': [
+            Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T20:30:00Z"))
+        ]
+    },
+    {
+        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
+        'w2': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T21:00:00Z")),
+        'expect': [
+            Window(start=date("2020-06-06T21:00:00Z"), end=date("2020-06-06T22:00:00Z"))
+        ]
+    },
+    {
+        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
+        'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:00:00Z")),
+        'expect': [
+            Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T20:30:00Z"))
+        ]
+    },
+    {
+        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
+        'w2': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
+        'expect': []
+    },
 ]
 
 for tc in split_test_cases:
