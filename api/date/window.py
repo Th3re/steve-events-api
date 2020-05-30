@@ -50,8 +50,11 @@ class Window(PrettyPrint):
     def __contains__(self, window):
         return window.start.timestamp() >= self.start.timestamp() and window.end.timestamp() <= self.end.timestamp()
 
+    def neighbor(self, window):
+        return self.start == window.end or self.end == window.start
+
     def merge(self, window):
-        if not self.intersect(window):
+        if not self.intersect(window) and not self.neighbor(window):
             return sorted([self, window], key=lambda x: x.start.timestamp())
         return [Window(
             start=datetime.fromtimestamp(min(self.start.timestamp(), window.start.timestamp()), tz=self.start.tzinfo),
@@ -70,6 +73,7 @@ class Window(PrettyPrint):
             else:
                 merged_windows.append(merge_result[0])
                 current_window = merge_result[1]
+        merged_windows.append(current_window)
         return merged_windows
 
     def __eq__(self, other):
@@ -212,9 +216,16 @@ test_cases = [
             Window(start=date("2020-06-06T12:00:00Z"), end=date("2020-06-06T12:30:00Z")),
             Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:00:00Z")),
         ],
+    },
+    {
+        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
+        'w2': Window(start=date("2020-06-06T12:00:00Z"), end=date("2020-06-06T20:00:00Z")),
+        'expect': [
+            Window(start=date("2020-06-06T12:00:00Z"), end=date("2020-06-06T22:00:00Z")),
+        ],
     }
 ]
-
+#
 # for tc in test_cases:
 #     w1 = tc['w1']
 #     w2 = tc['w2']
@@ -223,3 +234,50 @@ test_cases = [
 #     print(f'result: {result}')
 #     print(f'expect: {expect}')
 #     assert expect == result
+
+
+# test merged
+test_cases = [
+    {
+        'w1': [
+            Window(start=date("2020-06-06T19:00:00Z"), end=date("2020-06-06T20:00:00Z")),
+            Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T21:00:00Z")),
+            Window(start=date("2020-06-06T18:00:00Z"), end=date("2020-06-06T19:00:00Z"))
+        ],
+        'expect': [
+            Window(start=date("2020-06-06T18:00:00Z"), end=date("2020-06-06T21:00:00Z"))
+        ]
+    },
+    {
+        'w1': [
+            Window(start=date("2020-06-06T10:00:00Z"), end=date("2020-06-06T12:00:00Z")),
+            Window(start=date("2020-06-06T11:00:00Z"), end=date("2020-06-06T12:00:00Z")),
+            Window(start=date("2020-06-06T19:00:00Z"), end=date("2020-06-06T21:00:00Z")),
+            Window(start=date("2020-06-06T18:00:00Z"), end=date("2020-06-06T19:00:00Z"))
+        ],
+        'expect': [
+            Window(start=date("2020-06-06T10:00:00Z"), end=date("2020-06-06T12:00:00Z")),
+            Window(start=date("2020-06-06T18:00:00Z"), end=date("2020-06-06T21:00:00Z"))
+        ]
+    },
+    {
+        'w1': [
+            Window(start=date("2020-06-06T10:00:00Z"), end=date("2020-06-06T12:00:00Z")),
+            Window(start=date("2020-06-06T13:00:00Z"), end=date("2020-06-06T15:00:00Z")),
+            Window(start=date("2020-06-06T19:00:00Z"), end=date("2020-06-06T21:00:00Z")),
+        ],
+        'expect': [
+            Window(start=date("2020-06-06T10:00:00Z"), end=date("2020-06-06T12:00:00Z")),
+            Window(start=date("2020-06-06T13:00:00Z"), end=date("2020-06-06T15:00:00Z")),
+            Window(start=date("2020-06-06T19:00:00Z"), end=date("2020-06-06T21:00:00Z")),
+        ]
+    },
+]
+
+for tc in test_cases:
+    w1 = tc['w1']
+    expect = tc['expect']
+    result = Window.merged(w1)
+    print(f'result: {result}')
+    print(f'expect: {expect}')
+    assert expect == result
