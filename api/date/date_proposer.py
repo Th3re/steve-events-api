@@ -26,6 +26,17 @@ class DateProposer(Proposer):
             for user_id in participants
         ]
 
+    @staticmethod
+    def _map_events_to_windows(participant_events: List[ParticipantEvents]):
+        all_windows = []
+        for participant in participant_events:
+            participant_windows = [Window(start=event.start_time, end=event.end_time) for event in participant.events]
+            all_windows.extend(participant_windows)
+        return all_windows
+
     def propose(self, date: datetime, participants: List[str]) -> List[Window]:
         participants_events = self._participants_events(participants)
+        all_windows = self._map_events_to_windows(participants_events)
+        merged_windows = Window.merged(all_windows)
+        initial_window = Window.initial_window(date)
         return [Window(start=datetime.now(), end=datetime.now())]
