@@ -11,5 +11,5 @@ def post(propose_meeting_point_request):
     return {
          "code": APICode.OK,
          "message": "Proposed meeting points",
-         "dates": []
+         "locations": []
     }, HTTPStatus.OK

@@ -1,2 +1,3 @@
 connexion[swagger-ui]
 pymongo==3.9.0
+shapely==1.7.0
