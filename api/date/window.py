@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from api.libs.date.formatter import DatetimeFormatter, DATETIME_FORMAT
+from api.libs.date.formatter import DatetimeFormatter
 from api.libs.representation.pretty import PrettyPrint
 
 
@@ -61,13 +61,16 @@ class Window(PrettyPrint):
             end=datetime.fromtimestamp(max(self.end.timestamp(), window.end.timestamp()), tz=self.end.tzinfo)
         )]
 
-    def split_more_xd(self, windows):
+    def difference(self, windows):
         splitted = []
-        current_window = self
-        for window in windows:
-            result = current_window.split(window)
-            splitted.append(result[0])
-            current_window = result[-1]
+        current_end = self.start
+        intersections = [self.intersect(w) for w in windows]
+        for window in filter(lambda x: x is not None, intersections):
+            if window.start != current_end:
+                splitted.append(Window(current_end, window.start))
+            current_end = window.end
+        if current_end != self.end:
+            splitted.append(Window(current_end, self.end))
         return splitted
 
     @staticmethod
@@ -95,198 +98,3 @@ class Window(PrettyPrint):
             self.START: self.date_formatter.format_date(self.start),
             self.END: self.date_formatter.format_date(self.end)
         }
-
-
-date = lambda x: datetime.strptime(x, DATETIME_FORMAT)
-
-# Intersect tests
-test_cases = [
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T20:45:00Z")),
-        'expect': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T20:45:00Z"))
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T19:30:00Z"), end=date("2020-06-06T20:45:00Z")),
-        'expect': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T20:45:00Z"))
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:45:00Z")),
-        'expect': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:00:00Z"))
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:45:00Z")),
-        'expect': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:00:00Z"))
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T18:30:00Z"), end=date("2020-06-06T19:45:00Z")),
-        'expect': None
-    },
-    {
-        'w1': Window(start=date("2020-06-06T00:00:00Z"), end=date("2020-06-06T23:59:59Z")),
-        'w2': Window(start=date("2020-06-06T19:00:00Z"), end=date("2020-06-06T20:00:00Z")),
-    },
-]
-
-# for tc in test_cases:
-#     w1 = tc['w1']
-#     w2 = tc['w2']
-#     expect = tc['expect']
-#     result = w1.intersect(w2)
-#     assert expect == result
-
-
-# split tests
-split_test_cases = [
-    {
-        'w1': Window(start=date("2020-06-06T00:00:00Z"), end=date("2020-06-06T23:59:59Z")),
-        'w2': Window(start=date("2020-06-06T19:00:00Z"), end=date("2020-06-06T20:00:00Z")),
-        'expect': [
-            Window(start=date("2020-06-06T00:00:00Z"), end=date("2020-06-06T19:00:00Z")),
-            Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T23:59:59Z")),
-        ]
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T19:30:00Z"), end=date("2020-06-06T20:45:00Z")),
-        'expect': [
-            Window(start=date("2020-06-06T20:45:00Z"), end=date("2020-06-06T22:00:00Z"))
-        ]
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:45:00Z")),
-        'expect': [
-            Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T20:30:00Z"))
-        ]
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T21:00:00Z")),
-        'expect': [
-            Window(start=date("2020-06-06T21:00:00Z"), end=date("2020-06-06T22:00:00Z"))
-        ]
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'expect': [
-            Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T20:30:00Z"))
-        ]
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'expect': []
-    },
-]
-
-# for tc in split_test_cases:
-#     w1 = tc['w1']
-#     w2 = tc['w2']
-#     expect = tc['expect']
-#     result = w1.split(w2)
-#     print(f'result: {result}')
-#     print(f'expect: {expect}')
-#     assert expect == result
-
-
-# test merge
-test_cases = [
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T21:00:00Z")),
-        'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T21:30:00Z")),
-        'expect': [
-            Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T21:30:00Z"))
-        ]
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T21:30:00Z")),
-        'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'expect': [
-            Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z"))
-        ]
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T21:00:00Z")),
-        'expect': [
-            Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z"))
-        ]
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T12:00:00Z"), end=date("2020-06-06T12:30:00Z")),
-        'expect': [
-            Window(start=date("2020-06-06T12:00:00Z"), end=date("2020-06-06T12:30:00Z")),
-            Window(start=date("2020-06-06T20:30:00Z"), end=date("2020-06-06T22:00:00Z")),
-        ],
-    },
-    {
-        'w1': Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        'w2': Window(start=date("2020-06-06T12:00:00Z"), end=date("2020-06-06T20:00:00Z")),
-        'expect': [
-            Window(start=date("2020-06-06T12:00:00Z"), end=date("2020-06-06T22:00:00Z")),
-        ],
-    }
-]
-#
-# for tc in test_cases:
-#     w1 = tc['w1']
-#     w2 = tc['w2']
-#     expect = tc['expect']
-#     result = w1.merge(w2)
-#     print(f'result: {result}')
-#     print(f'expect: {expect}')
-#     assert expect == result
-
-
-# test merged
-test_cases = [
-    {
-        'w1': [
-            Window(start=date("2020-06-06T19:00:00Z"), end=date("2020-06-06T20:00:00Z")),
-            Window(start=date("2020-06-06T20:00:00Z"), end=date("2020-06-06T21:00:00Z")),
-            Window(start=date("2020-06-06T18:00:00Z"), end=date("2020-06-06T19:00:00Z"))
-        ],
-        'expect': [
-            Window(start=date("2020-06-06T18:00:00Z"), end=date("2020-06-06T21:00:00Z"))
-        ]
-    },
-    {
-        'w1': [
-            Window(start=date("2020-06-06T10:00:00Z"), end=date("2020-06-06T12:00:00Z")),
-            Window(start=date("2020-06-06T11:00:00Z"), end=date("2020-06-06T12:00:00Z")),
-            Window(start=date("2020-06-06T19:00:00Z"), end=date("2020-06-06T21:00:00Z")),
-            Window(start=date("2020-06-06T18:00:00Z"), end=date("2020-06-06T19:00:00Z"))
-        ],
-        'expect': [
-            Window(start=date("2020-06-06T10:00:00Z"), end=date("2020-06-06T12:00:00Z")),
-            Window(start=date("2020-06-06T18:00:00Z"), end=date("2020-06-06T21:00:00Z"))
-        ]
-    },
-    {
-        'w1': [
-            Window(start=date("2020-06-06T10:00:00Z"), end=date("2020-06-06T12:00:00Z")),
-            Window(start=date("2020-06-06T13:00:00Z"), end=date("2020-06-06T15:00:00Z")),
-            Window(start=date("2020-06-06T19:00:00Z"), end=date("2020-06-06T21:00:00Z")),
-        ],
-        'expect': [
-            Window(start=date("2020-06-06T10:00:00Z"), end=date("2020-06-06T12:00:00Z")),
-            Window(start=date("2020-06-06T13:00:00Z"), end=date("2020-06-06T15:00:00Z")),
-            Window(start=date("2020-06-06T19:00:00Z"), end=date("2020-06-06T21:00:00Z")),
-        ]
-    },
-]
-
-# for tc in test_cases:
-#     w1 = tc['w1']
-#     expect = tc['expect']
-#     result = Window.merged(w1)
-#     print(f'result: {result}')
-#     print(f'expect: {expect}')
-#     assert expect == result

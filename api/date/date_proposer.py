@@ -17,14 +17,13 @@ class DateProposer(Proposer):
     def __init__(self, store: Store):
         self.store = store
 
-    def _participants_events(self, participants: List[str]) -> List[ParticipantEvents]:
-        return [
-            ParticipantEvents(
-                participant=user_id,
-                events=list(map(lambda e: Event.from_dict(e), self.store.get(user_id)))
-            )
-            for user_id in participants
-        ]
+    def _participant_events(self, user_id: str, date: datetime) -> ParticipantEvents:
+        events = [event for event in [Event.from_json(e) for e in self.store.get(user_id)]
+                  if event.start_time.day == date.day or event.end_time.day == date.day]
+        return ParticipantEvents(user_id, events)
+
+    def _participants_events(self, participants: List[str], date: datetime) -> List[ParticipantEvents]:
+        return [self._participant_events(user_id, date) for user_id in participants]
 
     @staticmethod
     def _map_events_to_windows(participant_events: List[ParticipantEvents]):
@@ -35,8 +34,9 @@ class DateProposer(Proposer):
         return all_windows
 
     def propose(self, date: datetime, participants: List[str]) -> List[Window]:
-        participants_events = self._participants_events(participants)
+        participants_events = self._participants_events(participants, date)
         all_windows = self._map_events_to_windows(participants_events)
         merged_windows = Window.merged(all_windows)
         initial_window = Window.initial_window(date)
-        return [Window(start=datetime.now(), end=datetime.now())]
+        slots = initial_window.difference(merged_windows)
+        return slots
