@@ -1,4 +1,11 @@
-FROM python:3.7.3-alpine3.9
+FROM dangerfarms/geodrf-alpine AS build
+
+FROM python:3.7
+
+COPY --from=build /usr/lib/libgdal.so.20.1.3 /usr/lib/libgdal.so.20.1.3
+COPY --from=build /usr/lib/libgeos_c.so.1 /usr/lib/libgeos_c.so.1
+RUN ln -s /usr/lib/libgeos_c.so.1 /usr/local/lib/libgeos_c.so
+RUN ln -s /usr/lib/libgdal.so.20.1.3 /usr/lib/libgdal.so
 
 WORKDIR /api
 
