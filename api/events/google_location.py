@@ -26,7 +26,7 @@ class GoogleLocationFetcher(LocationFetcher):
         return Location(location['lat'], location['lng'])
 
     def fetch_place(self, location: Location) -> Optional[Place]:
-        params = {'key': self.api_key, 'lng': location.longitude, 'lat': location.latitude}
+        params = {'key': self.api_key, 'latlng': f'{location.latitude},{location.longitude}'}
         response = self.client.get('maps/api/geocode/json', None, params)
         LOG.info(f'Fetched location: {response}')
         if response['status'] != 'OK':
