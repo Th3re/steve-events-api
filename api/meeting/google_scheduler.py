@@ -18,11 +18,11 @@ class GoogleScheduler(Scheduler):
             "location": meeting.location,
             "start": {
                 "dateTime": meeting.start,
-                "timeZone": "Poland/Warsaw",
+                "timeZone": "Europe/Warsaw",
             },
             "end": {
                 "dateTime": meeting.end,
-                "timeZone": "Poland/Warsaw",
+                "timeZone": "Europe/Warsaw",
             },
             "attendees": [dict(email=participant) for participant in meeting.participants]
         }
@@ -30,5 +30,6 @@ class GoogleScheduler(Scheduler):
     def schedule(self, token: str, meeting: Meeting):
         body = self._prepare_payload(meeting)
         params = dict(alt='json')
-        response = self.client.post('/calendar/v3/calendars/primary/events', token, params, body)
+        response = self.client.post('calendar/v3/calendars/primary/events', token, params, body)
         LOG.info(f'Meeting creation response: {response}')
+        return response
