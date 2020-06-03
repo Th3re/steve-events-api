@@ -97,7 +97,9 @@ definitions:
     type: object
     required:
       - participants
-      - datetime
+      - start
+      - end
+      - host
     properties:
       host:
         type: string
