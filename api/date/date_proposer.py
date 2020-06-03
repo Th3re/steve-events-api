@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from api.api.events.fetcher import ParticipantEvents, Fetcher
+from api.api.fetcher.fetcher import ParticipantEvents, Fetcher
 from api.date.proposer import Proposer
 from api.date.window import Window
 

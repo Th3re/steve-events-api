@@ -17,6 +17,8 @@ class Google(EnvironmentReader):
     def __init__(self):
         super()
         self.host = self.get('host')
+        self.maps_host = self.get('maps_host')
+        self.apikey = self.get('apikey')
 
 
 class Auth(EnvironmentReader):

@@ -1,8 +1,11 @@
-from datetime import datetime
-from typing import Optional
+import logging
 
-from api.api.events.fetcher import Fetcher, ParticipantEvents
+from typing import Optional
+from datetime import datetime
 from api.libs.events.event import Event
+from api.api.fetcher.fetcher import Fetcher, ParticipantEvents
+
+LOG = logging.getLogger(__name__)
 
 
 class EventsFetcher(Fetcher):
@@ -20,6 +23,6 @@ class EventsFetcher(Fetcher):
 
     def get_previous_event(self, user_id: str, date: datetime) -> Optional[Event]:
         user_events = self.fetch_by_date(user_id, date).events
-        past_events = filter(lambda x: x.end.timestamp() < date.timestamp(), user_events)
-        previous_event = sorted(past_events, key=lambda x: x.end.timestamp())[-1]
-        return previous_event
+        past_events = filter(lambda x: x.end_time.timestamp() < date.timestamp(), user_events)
+        events = sorted(past_events, key=lambda x: x.end_time.timestamp())
+        return events[-1] if events else None
