@@ -75,6 +75,8 @@ class Window(PrettyPrint):
 
     @staticmethod
     def merged(windows):
+        if len(windows) < 2:
+            return windows
         sorted_windows = sorted(windows, key=lambda x: x.start.timestamp())
         merged_windows = []
         current_window = sorted_windows[0]
