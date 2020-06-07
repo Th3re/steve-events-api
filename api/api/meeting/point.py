@@ -21,5 +21,5 @@ def post(propose_meeting_point_request):
     return {
          "code": APICode.OK,
          "message": "Proposed meeting points",
-         "meetingPoints": meeting_points
+         "meetingPoints": list(map(lambda x: x.to_json(), meeting_points))
     }, HTTPStatus.OK

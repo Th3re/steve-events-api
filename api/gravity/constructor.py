@@ -7,6 +7,9 @@ class Location:
         self.longitude = longitude
         self.latitude = latitude
 
+    def to_json(self):
+        return {'latitude': self.latitude, 'longitude': self.longitude}
+
 
 class Constructor(abc.ABC):
     @abc.abstractmethod

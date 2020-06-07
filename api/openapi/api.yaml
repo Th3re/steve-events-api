@@ -92,7 +92,7 @@ definitions:
         example: "Events stored"
       dates:
         type: array
-        example: ["2021-02-21T20:00:00Z", "2022-03-22T22:00:00Z"]
+        example: [{"start": "2021-02-21T20:00:00Z", "end": "2022-03-22T22:00:00Z"}]
   ProposeMeetingPointRequest:
     type: object
     required:
@@ -130,7 +130,8 @@ definitions:
         example: "Meeting points obtained"
       meetingPoints:
         type: array
-        example: ["Łojasiewicza 11, Kraków", "Rynek Główny 1, Kraków"]
+        example: [{"address": "Łojasiewicza 11, Kraków", "Rynek Główny 1, Kraków",
+                   "coordinates": {"lattitude": 74, "longitude": 50}}]
   CreateMeetingRequest:
     type: object
     required:

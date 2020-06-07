@@ -5,8 +5,12 @@ from api.gravity.constructor import Location
 
 
 class Place:
-    def __init__(self, address):
+    def __init__(self, address, coordinates):
         self.address = address
+        self.coordinates = coordinates
+
+    def to_json(self):
+        return {'address': self.address, 'coordinates': self.coordinates.to_json()}
 
 
 class LocationFetcher(abc.ABC):

@@ -32,4 +32,4 @@ class GoogleLocationFetcher(LocationFetcher):
         if response['status'] != 'OK':
             return
         place = response['results'][0]
-        return Place(place['formatted_address'])
+        return Place(place['formatted_address'], location)
